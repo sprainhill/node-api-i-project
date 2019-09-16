@@ -15,13 +15,13 @@ server.use(express.json());
 
 // POST a new user
 server.post("/api/users", (req, res) => {
-  const newUser = req.body;
-  console.log("newUser body", newUser);
+  const { name, bio } = req.body;
+  console.log("POST user req.body", req.body);
 
-  if (!newUser.name || !newUser.bio) {
+  if (!name || !bio) {
     res.status(400).json({ message: "Name and bio required" });
   } else {
-    db.insert(newUser)
+    db.insert(req.body)
       .then(user => {
         res.status(201).json(user);
       })
@@ -34,4 +34,15 @@ server.post("/api/users", (req, res) => {
 const port = 8000;
 server.listen(port, () => {
   console.log(`API running on port ${port} `);
+});
+
+// GET users
+server.get("/api/users", (req, res) => {
+  db.find()
+    .then(users => {
+      res.status(200).json(users);
+    })
+    .catch(error => {
+      res.status(500).json({ message: "You aint gittin these users, ERROR" });
+    });
 });
