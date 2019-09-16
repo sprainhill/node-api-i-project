@@ -46,3 +46,16 @@ server.get("/api/users", (req, res) => {
       res.status(500).json({ message: "You aint gittin these users, ERROR" });
     });
 });
+
+// GET user by id
+server.get("/api/users/:id", (req, res) => {
+  const { id } = req.params;
+
+  db.findById(id)
+    .then(users => {
+      res.status(200).json(users);
+    })
+    .catch(error => {
+      res.status(500).json({ message: "Error getting user by id" });
+    });
+});
