@@ -15,8 +15,8 @@ server.use(express.json());
 
 // POST a new user
 server.post("/api/users", (req, res) => {
-  console.log("newUser body", newUser);
   const newUser = req.body;
+  console.log("newUser body", newUser);
 
   if (!newUser.name || !newUser.bio) {
     res.status(400).json({ message: "Name and bio required" });
@@ -25,7 +25,7 @@ server.post("/api/users", (req, res) => {
       .then(user => {
         res.status(201).json(user);
       })
-      .catch(error => {
+      .catch(() => {
         res.status(500).json({ message: "Error adding new user" });
       });
   }
