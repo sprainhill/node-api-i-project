@@ -88,15 +88,19 @@ server.put("/api/users/:id", (req, res) => {
   const { id } = req.params;
   const changes = req.body;
 
-  db.update(id, changes)
-    .then(count => {
-      if (count) {
-        res.status(200).json({ message: `${count} user records updated` });
-      } else {
-        res.status(404).json({ message: "user not found" });
-      }
-    })
-    .catch(error => {
-      res.status(500).json({ message: "Error updating user" });
-    });
+  if (changes.name && changes.bio) {
+    db.update(id, changes)
+      .then(count => {
+        if (count) {
+          res.status(200).json({ message: `${count} user records updated` });
+        } else {
+          res.status(404).json({ message: "user not found" });
+        }
+      })
+      .catch(error => {
+        res.status(500).json({ message: "Error updating user" });
+      });
+  } else {
+    res.status(400).json({ message: "name and bio are required" });
+  }
 });
