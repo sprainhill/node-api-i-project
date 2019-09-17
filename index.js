@@ -31,10 +31,6 @@ server.post("/api/users", (req, res) => {
   }
 });
 
-const port = 8000;
-server.listen(port, () => {
-  console.log(`API running on port ${port} `);
-});
 
 // GET users
 server.get("/api/users", (req, res) => {
@@ -45,13 +41,13 @@ server.get("/api/users", (req, res) => {
     .catch(error => {
       res.status(500).json({ message: "You aint gittin these users, ERROR" });
     });
-});
+  });
+  
+  // GET user by id
+  server.get("/api/users/:id", (req, res) => {
+    const { id } = req.params;
 
-// GET user by id
-server.get("/api/users/:id", (req, res) => {
-  const { id } = req.params;
-
-  db.findById(id)
+    db.findById(id)
     .then(user => {
       if (user) {
         res.status(200).json(user);
@@ -62,13 +58,13 @@ server.get("/api/users/:id", (req, res) => {
     .catch(error => {
       res.status(500).json({ message: "Erro retrieving user by id" });
     });
-});
+  });
 
-// DELETE user by id
-server.delete("/api/users/:id", (req, res) => {
-  const { id } = req.params;
-
-  db.findById(id)
+  // DELETE user by id
+  server.delete("/api/users/:id", (req, res) => {
+    const { id } = req.params;
+    
+    db.findById(id)
     .then(user => {
       if (user) {
         db.remove(id).then(count => {
@@ -81,26 +77,67 @@ server.delete("/api/users/:id", (req, res) => {
     .catch(error => {
       res.status(500).json({ message: "Error retrieving user by id" });
     });
-});
-
-// UPDATE user by id
+  });
+  
+  // UPDATE user by id
 server.put("/api/users/:id", (req, res) => {
   const { id } = req.params;
   const changes = req.body;
-
+  
   if (changes.name && changes.bio) {
     db.update(id, changes)
-      .then(count => {
-        if (count) {
-          res.status(200).json({ message: `${count} user records updated` });
-        } else {
+    .then(count => {
+      if (count) {
+        res.status(200).json({ message: `${count} user records updated` });
+      } else {
           res.status(404).json({ message: "user not found" });
         }
       })
       .catch(error => {
         res.status(500).json({ message: "Error updating user" });
       });
-  } else {
-    res.status(400).json({ message: "name and bio are required" });
-  }
-});
+    } else {
+      res.status(400).json({ message: "name and bio are required" });
+    }
+  });
+
+  let hobbits = [
+    {
+      id: 1,
+      name: 'Bilbo Baggins',
+      age: 111,
+    },
+    {
+      id: 2,
+      name: 'Frodo Baggins',
+      age: 33,
+    },
+  ];
+  let nextId = 3;
+  
+  // and modify the post endpoint like so:
+  server.post('/hobbits', (req, res) => {
+    const hobbit = req.body;
+    hobbit.id = nextId++;
+  
+    hobbits.push(hobbit);
+  
+    res.status(201).json(hobbits);
+  });
+
+  server.get('/hobbits', (req, res) => {
+    // query string parameters get added to req.query
+    const sortField = req.query.sortby || 'id';
+  
+    // apply the sorting
+    const response = hobbits.sort(
+      (a, b) => (a[sortField] < b[sortField] ? -1 : 1)
+    );
+  
+    res.status(200).json(response);
+  });
+  
+  const port = 8000;
+  server.listen(port, () => {
+    console.log(`API running on port ${port} `);
+  });
