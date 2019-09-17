@@ -125,6 +125,7 @@ server.put("/api/users/:id", (req, res) => {
     res.status(201).json(hobbits);
   });
 
+  // GET hobbits
   server.get('/hobbits', (req, res) => {
     // query string parameters get added to req.query
     const sortField = req.query.sortby || 'id';
@@ -135,6 +136,20 @@ server.put("/api/users/:id", (req, res) => {
     );
   
     res.status(200).json(response);
+  });
+
+  // PUT hobbits
+  server.put('/hobbits/:id', (req, res) => {
+
+    const hobbit = hobbits.find(h => h.id == req.params.id);
+
+    if (!hobbit) {
+      res.status(404).json({ message: `Hobbit doesn't exist, my guy`});
+    } else {
+      // modify the existing hobbit
+      Object.assign(hobbit, req.body)
+      res.status(200).json(hobbit);
+    }
   });
   
   const port = 8000;
